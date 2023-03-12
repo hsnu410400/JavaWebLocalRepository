@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="/JavaWeb/css/pure-min.css">
+		<link rel="stylesheet" href="/JavaWeb/css/button-style.css">
+		<title>BMI Page</title>
+	</head>
+	<body style="padding: 20px">
+		
+		<form class="pure-form" method="post" action="/JavaWeb/servlet/bmi">
+			<fieldset>
+				<legend>BMI 計算</legend>
+				身高: <input type="number" step="0.1" placeholder="請輸入身高" id="height" name="height"><p>
+				體重: <input type="number" step="0.1" placeholder="請輸入體重" id="weight" name="weight"><p>
+				<button type="reset" class="pure-button button-secondary">清除</button>
+				<button type="submit" class="pure-button pure-button-primary">計算</button>
+			</fieldset>
+		</form>
+		
+	</body>
+</html>

@@ -1,0 +1,22 @@
+<%@ page import="spa.entity.*"%>
+<%@ page import="java.util.List"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
+<form class="pure-form" method="post" action="/JavaWeb/servlet/spa/">
+	<fieldset>
+		<legend>${ sessionScope['member']['username'] } Spa 預約</legend>
+		姓名: <input type="text" placeholder="請輸入名字" id="userName" name="userName" value="${ sessionScope['member']['username'] }" readonly required><p>
+		SPA: <select id="spaId" name="spaId">
+				<% for(Spa spa : spaList) { %>
+					<option value="<%=spa.getId() %>"><%=spa.getName() %></option>
+				<% } %>
+			 </select><p>
+		師傅: <select id="masterId" name="masterId">
+				<% for(Master master : masterList) { %>
+					<option value="<%=master.getId() %>"><%=master.getName() %></option>
+				<% } %>
+			 </select><p>
+		日期: <input type="datetime-local" id="reserve" name="reserve"><p>					 	 
+		<button type="reset" class="pure-button button-secondary">清除</button>
+		<button type="submit" class="pure-button pure-button-primary">預約</button>
+	</fieldset>
+</form>
