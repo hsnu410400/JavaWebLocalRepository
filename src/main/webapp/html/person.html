@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="/JavaWeb/css/pure-min.css">
+		<link rel="stylesheet" href="/JavaWeb/css/button-style.css">
+		<title>Person Page</title>
+	</head>
+	<body style="padding: 20px">
+		<form class="pure-form" method="post" action="/JavaWeb/servlet/person">
+			<fieldset>
+				<legend>會員資料建檔</legend>
+				姓名: <input type="text" placeholder="請輸入姓名" id="name" name="name"><p>
+				年齡: <input type="number" placeholder="請輸入年齡" id="age" name="age"><p>
+				姓別: <input type="radio" id="sex" name="sex" value="男" checked>男
+					 <input type="radio" id="sex" name="sex" value="女">女<p>
+				生日: <input type="date" id="birth" name="birth" ><p>
+				學歷: <select id="edu" name="edu">
+						<option value="高中">高中</option>
+						<option value="大學">大學</option>
+						<option value="研究所">研究所</option>
+					 </select><p>
+				興趣: <input type="checkbox" id="hobby" name="hobby" value="程式">程式
+					 <input type="checkbox" id="hobby" name="hobby" value="電影">電影
+					 <input type="checkbox" id="hobby" name="hobby" value="爬山">爬山<p>
+				備註: <textarea rows="5" cols="10" id="memo" name="memo"></textarea><p>	 	 
+				<button type="reset" class="pure-button button-secondary">清除</button>
+				<button type="submit" class="pure-button pure-button-primary">建檔</button>
+			</fieldset>
+		</form>
+		
+	</body>
+</html>

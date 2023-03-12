@@ -1,0 +1,33 @@
+<%@ page import="spa.entity.Master"%>
+<%@ page import="spa.entity.Spa"%>
+<%@ page import="java.util.List"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
+
+<form class="pure-form">
+    <fieldset>
+        <legend>Spa 產品說明</legend>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+                <tr>
+                    <th>編號</th>
+                    <th>名稱</th>
+                    <th>說明</th>
+                    <th>分鐘</th>
+                    <th>價格</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(Spa spa : spaList) { %>
+                <tr onmouseover="this.style.backgroundColor='#91A561'" 
+                    onmouseout="this.style.backgroundColor='#FFFFFF'">
+                    <td align="center"><%=spa.getId() %></td>
+                    <td><%=spa.getName() %></td>
+                    <td><%=spa.getContent() %></td>
+                    <td align="center"><%=spa.getTime() %></td>
+                    <td align="right">$<%=spa.getPrice() %></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </fieldset>
+</form>

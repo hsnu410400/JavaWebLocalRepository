@@ -1,0 +1,31 @@
+<%@page import="spa.listener.SpaSessionListener"%>
+<%@page import="spa.entity.Spa"%>
+<%@page import="java.net.http.WebSocket.Listener"%>
+<%@ page language="java" pageEncoding="UTF-8"%>
+<!-- Banner  -->
+<img src="/JavaWeb/image/spa_banner.jpg">
+<!-- Menu  -->
+<div class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        <li class="pure-menu-item">
+            <a href="/JavaWeb/servlet/spa/" class="pure-menu-link">Spa 預約</a>
+        </li>
+        <li class="pure-menu-item">
+            <a href="/JavaWeb/servlet/spa/list" class="pure-menu-link">Spa 所有預約</a>
+        </li>
+        
+        <li class="pure-menu-item" style="display: ${ sessionScope['isPass'] ? 'none':'' };">
+            <a href="/JavaWeb/servlet/spa/login" class="pure-menu-link">登入</a>
+        </li>
+        	
+        <li class="pure-menu-item" style="display: ${ sessionScope['isPass'] ? '':'none' };">
+            <a href="/JavaWeb/servlet/spa/logout" class="pure-menu-link">登出 </a>
+        </li>
+            
+        <li class="pure-menu-item">
+            NOW:<%=SpaSessionListener.currentCount%>
+            TOTAL:<%=SpaSessionListener.totalCount%>
+        </li>
+        
+    </ul>
+</div>
