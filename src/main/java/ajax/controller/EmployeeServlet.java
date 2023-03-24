@@ -47,7 +47,6 @@ public class EmployeeServlet extends HttpServlet {
 		PrintWriter out = resp.getWriter();
 		BufferedReader reader=req.getReader();
 		Employee employee=gson.fromJson(reader, Employee.class);
-		employee.setId(employeeDao.getEmployeeNextId());
 		employeeDao.addEmployee(employee);
 		out.print("{'result': 'ADD OK'}");
 		out.flush();
