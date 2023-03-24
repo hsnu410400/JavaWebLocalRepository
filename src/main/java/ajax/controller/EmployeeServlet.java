@@ -45,8 +45,9 @@ public class EmployeeServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		PrintWriter out = resp.getWriter();
-		BufferedReader reader=req.getReader();
-		Employee employee=gson.fromJson(reader, Employee.class);
+		BufferedReader reader = req.getReader(); // 取得前端傳來的串流資料(json)
+		Employee employee = gson.fromJson(reader, Employee.class);
+		// 新增
 		employeeDao.addEmployee(employee);
 		out.print("{'result': 'ADD OK'}");
 		out.flush();
@@ -54,45 +55,43 @@ public class EmployeeServlet extends HttpServlet {
 	
 	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		PrintWriter out = resp.getWriter();
-		String pathInfo=req.getPathInfo();
+		String pathInfo = req.getPathInfo();
 		try {
-			Integer id=Integer.parseInt(pathInfo.substring(1));
+			Integer id = Integer.parseInt(pathInfo.substring(1));
 			Employee employee = employeeDao.getEmployeeById(id);
-			if (employee==null) {
+			if(employee == null) {
 				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			}else {
-				BufferedReader reader=req.getReader();
-				Employee updatEmployee=gson.fromJson(reader, Employee.class);
-				updatEmployee.setId(id);
-				employeeDao.updateEmployee(id, updatEmployee);
+			} else {
+				PrintWriter out = resp.getWriter();
+				BufferedReader reader = req.getReader();
+				Employee updateEmployee = gson.fromJson(reader, Employee.class);
+				updateEmployee.setId(id);
+				employeeDao.updateEmployee(id, updateEmployee);
 				out.print("{'result': 'UPDATE OK'}");
 				out.flush();
 			}
 		} catch (Exception e) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-		} 
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 	}
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		PrintWriter out = resp.getWriter();
-		String pathInfo=req.getPathInfo();
+		String pathInfo = req.getPathInfo();
 		try {
-			Integer id=Integer.parseInt(pathInfo.substring(1));
+			Integer id = Integer.parseInt(pathInfo.substring(1));
 			Employee employee = employeeDao.getEmployeeById(id);
-			if (employee==null) {
+			if(employee == null) {
 				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			}else {
-				BufferedReader reader=req.getReader();
-				Employee updatEmployee=gson.fromJson(reader, Employee.class);
-				updatEmployee.setId(id);
-				employeeDao.updateEmployee(id, updatEmployee);
+			} else {
+				PrintWriter out = resp.getWriter();
+				employeeDao.deleteEmployee(id);
 				out.print("{'result': 'DELETE OK'}");
 				out.flush();
 			}
 		} catch (Exception e) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-		} 
+			e.printStackTrace();
+			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 	}
 }

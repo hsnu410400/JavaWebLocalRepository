@@ -38,48 +38,55 @@ public class EmployeeDao {
 	
 	public Employee getEmployeeById(Integer id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Employee employee=entityManager.find(Employee.class, id);
+		Employee employee = entityManager.find(Employee.class, id);
 		entityManager.close();
 		return employee;
 	}
 	
 	public void addEmployee(Employee employee) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//建立交易
-		EntityTransaction etx=entityManager.getTransaction();
-		etx.begin();
+		// 建立交易
+		EntityTransaction etx = entityManager.getTransaction();
+		etx.begin(); // 開始
+		// 新增
 		entityManager.persist(employee);
-		//etx.rollback();
-		etx.commit();
+		//etx.rollback(); // 回滾(若有錯誤發生)
+		etx.commit(); // 提交
 		entityManager.close();
 	}
 	
 	public void updateEmployee(Integer id, Employee employee) {
-		Employee existingEmplyee=getEmployeeById(id);
-		if (existingEmplyee != null) {
+		Employee existingEmployee = getEmployeeById(id);
+		if(existingEmployee == null) {
 			return;
 		}
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//建立交易
-		EntityTransaction etx=entityManager.getTransaction();
-		etx.begin();
+		// 建立交易
+		EntityTransaction etx = entityManager.getTransaction();
+		etx.begin(); // 開始
+		// 修改
 		entityManager.merge(employee);
-		etx.commit();
+		etx.commit(); // 提交
 		entityManager.close();
 	}
 	
 	public void deleteEmployee(Integer id) {
+		
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//建立交易
-		EntityTransaction etx=entityManager.getTransaction();
-		etx.begin();
-		//在進行刪除時，將查找也放到etx環境中
-		Employee existingEmplyee=getEmployeeById(id);
-		if (existingEmplyee != null) {
+		// 建立交易
+		EntityTransaction etx = entityManager.getTransaction();
+		etx.begin(); // 開始
+		// 注意在進行刪除的時候要把查找也放到 etx 環境中避免斷開連接的實體
+		Employee existingEmployee = getEmployeeById(id);
+		if(existingEmployee == null) {
 			return;
-		}//移除
-		entityManager.remove(existingEmplyee);
-		etx.commit();
+		}
+		// 移除
+		Employee managedEmployee = entityManager.merge(existingEmployee);
+		entityManager.remove(managedEmployee);
+		
+		etx.commit(); // 提交
+		
 		entityManager.close();
 	}
 
