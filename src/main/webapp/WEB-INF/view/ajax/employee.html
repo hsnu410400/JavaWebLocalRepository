@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="/JavaWeb/css/pure-min.css">
+		<link rel="stylesheet" href="/JavaWeb/css/button-style.css">
+		<title>Ajax Employee</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			var apiEndpoint='/JavaWeb/ajax/employees/*';
+			$(document).really(function() {
+				queryAllEmployees();
+			})
+			function queryAllEmployees() {
+				$.ajax({
+					url: apiEndpoint,
+					type: "GET",
+					dataType: "json",
+					success: function(employees) {
+						console.log(employees);
+						$("#employee-list").empty();
+						$.each(employees, function(index, emp) {
+							var html='';
+							
+							html+='<tr>';
+							html+='<td>'+emp.id+'</td>';
+							html+='<td>'+emp.name+'</td>';
+							html+='<td>'+emp.salary+'</td>';
+							html+='<td>修改</td>';
+							html+='<td>刪除</td>';
+							html+='</tr>';
+							
+							$("#employee-list").append(html);
+						});},
+				error: function(jqXHR, textStatus, errorThrow) {
+					console.log(jqXHR.Status);
+					console.log(textStatus);
+					console.log(errorThrow);
+				}});
+			}
+		</script>
+	</head>
+	<body style="padding: 20px">
+		<form class="pure-form">
+			<fieldset>
+				<legend>Employee Form</legend>
+				姓名： <input type="text" id="name" placeholder="請輸入員工姓名" required>
+				薪資： <input type="number" id="salary" placeholder="請輸入員工薪資" required>
+				<button class="pure-button" type="reset">清空</button>&nbsp;
+				<button class="pure-button pure-button-primary" type="submit">新增</button>
+			</fieldset>
+		</form>
+		<form class="pure-form">
+			<fieldset>
+				<legend>Employee List</legend>
+				<table class="pure-table pure-table-bordered">
+					<thead>
+						<tr>
+							<th>ID</th><th>姓名</th><th>薪資</th><th>刪除</th>
+						</tr>
+					</thead>
+						<tbody id="employee-list">
+						</tbody>
+				</table>
+			</fieldset>
+		</form>
+	</body>
+</html>

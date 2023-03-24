@@ -1,0 +1,99 @@
+package ajax.controller;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
+
+import ajax.dao.EmployeeDao;
+import ajax.entity.Employee;
+
+@WebServlet("/ajax/employees/*")
+public class EmployeeServlet extends HttpServlet {
+	private EmployeeDao employeeDao = EmployeeDao.getInstance();
+	private Gson gson = new Gson();
+	
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String pathInfo = req.getPathInfo();
+		PrintWriter out = resp.getWriter();
+		if(pathInfo == null || pathInfo.equals("/") || pathInfo.equals("/*")) {
+			// 取得所有 employees
+			List<Employee> employees = employeeDao.getAllEmployees();
+			out.print(gson.toJson(employees));
+		} else {
+			// 根據 id 找到該筆 Employee
+			Integer id = Integer.parseInt(pathInfo.substring(1));
+			Employee employee = employeeDao.getEmployeeById(id);
+			if(employee == null) {
+				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			} else {
+				out.print(gson.toJson(employee));
+			}
+		}
+		out.flush();
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		PrintWriter out = resp.getWriter();
+		BufferedReader reader=req.getReader();
+		Employee employee=gson.fromJson(reader, Employee.class);
+		employee.setId(employeeDao.getEmployeeNextId());
+		employeeDao.addEmployee(employee);
+		out.print("{'result': 'ADD OK'}");
+		out.flush();
+	}
+	
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		PrintWriter out = resp.getWriter();
+		String pathInfo=req.getPathInfo();
+		try {
+			Integer id=Integer.parseInt(pathInfo.substring(1));
+			Employee employee = employeeDao.getEmployeeById(id);
+			if (employee==null) {
+				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			}else {
+				BufferedReader reader=req.getReader();
+				Employee updatEmployee=gson.fromJson(reader, Employee.class);
+				updatEmployee.setId(id);
+				employeeDao.updateEmployee(id, updatEmployee);
+				out.print("{'result': 'UPDATE OK'}");
+				out.flush();
+			}
+		} catch (Exception e) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		} 
+	}
+	
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		PrintWriter out = resp.getWriter();
+		String pathInfo=req.getPathInfo();
+		try {
+			Integer id=Integer.parseInt(pathInfo.substring(1));
+			Employee employee = employeeDao.getEmployeeById(id);
+			if (employee==null) {
+				resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			}else {
+				BufferedReader reader=req.getReader();
+				Employee updatEmployee=gson.fromJson(reader, Employee.class);
+				updatEmployee.setId(id);
+				employeeDao.updateEmployee(id, updatEmployee);
+				out.print("{'result': 'DELETE OK'}");
+				out.flush();
+			}
+		} catch (Exception e) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		} 
+	}
+}
