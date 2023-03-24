@@ -7,10 +7,50 @@
 		<title>Ajax Employee</title>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script type="text/javascript">
-			var apiEndpoint='/JavaWeb/ajax/employees/*';
-			$(document).really(function() {
+			var apiEndpoint = '/JavaWeb/ajax/employees/';
+			
+			// 頁面載入完畢後所自動要執行的第一個程序
+			$(document).ready(function() {
 				queryAllEmployees();
-			})
+				
+				// 表單 submit 事件
+				$("#add-form").submit(function(event) {
+					event.preventDefault(); // 防止表單的預設行為
+					// 抓取表單資料
+					var empId = $('#id-input').val();
+					var name = $('#name-input').val();
+					var salary = $('#salary-input').val();
+					// 建立物件
+					var employee = {id: empId, name: name, salary: salary};
+					// 調用新增方法
+					addEmployee(employee);
+				});
+			});	
+			
+			// 新增
+			function addEmployee(employee) {
+				// 新增時給一個預設 id
+				employee.id = 0;
+				$.ajax({
+					url: apiEndpoint,
+					type: "POST",
+					dataType: "json",
+					data: JSON.stringify(employee), // 將 employee物件 轉 json 格式的字串
+					contentType: "application/json",
+					success: function(employees) {
+						console.log(employees);
+						// 調用查詢所有資料方法
+						queryAllEmployees();
+					},
+					error: function(jqXHR, textStatus) {
+						console.log("新增失敗");
+						console.log(jqXHR.status);
+						console.log(textStatus);
+					}
+				});
+			}
+			
+			// 查詢所有資料
 			function queryAllEmployees() {
 				$.ajax({
 					url: apiEndpoint,
@@ -19,50 +59,58 @@
 					success: function(employees) {
 						console.log(employees);
 						$("#employee-list").empty();
-						$.each(employees, function(index, emp) {
-							var html='';
-							
-							html+='<tr>';
-							html+='<td>'+emp.id+'</td>';
-							html+='<td>'+emp.name+'</td>';
-							html+='<td>'+emp.salary+'</td>';
-							html+='<td>修改</td>';
-							html+='<td>刪除</td>';
-							html+='</tr>';
+						$.each(employees, function(index, emp){
+							var html = '';
+							// 組 tbody-tr-td
+							html += '<tr>';
+							html += '<td>' + emp.id + '</td>';
+							html += '<td>' + emp.name + '</td>';
+							html += '<td>' + emp.salary + '</td>';
+							html += '<td>修改</td>';
+							html += '<td>刪除</td>';
+							html += '</tr>';
 							
 							$("#employee-list").append(html);
-						});},
-				error: function(jqXHR, textStatus, errorThrow) {
-					console.log(jqXHR.Status);
-					console.log(textStatus);
-					console.log(errorThrow);
-				}});
+						});
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						console.log(jqXHR.status);
+						console.log(textStatus);
+						console.log(errorThrow);
+					}
+				});
 			}
+		
 		</script>
 	</head>
 	<body style="padding: 20px">
-		<form class="pure-form">
+		<form class="pure-form" id="add-form">
 			<fieldset>
 				<legend>Employee Form</legend>
-				姓名： <input type="text" id="name" placeholder="請輸入員工姓名" required>
-				薪資： <input type="number" id="salary" placeholder="請輸入員工薪資" required>
+				<input type="hidden" id="id-input" /> <!-- 隱藏 id -->
+				姓名: <input type="text" id="name-input" placeholder="請輸入員工姓名" required><p>
+				薪資: <input type="number" id="salary-input" placeholder="請輸入員工薪資" required><p>
 				<button class="pure-button" type="reset">清空</button>&nbsp;
-				<button class="pure-button pure-button-primary" type="submit">新增</button>
+				<button class="pure-button pure-button-primary" type="submit" id="submit-btn">新增</button>
 			</fieldset>
 		</form>
+		
 		<form class="pure-form">
 			<fieldset>
 				<legend>Employee List</legend>
 				<table class="pure-table pure-table-bordered">
 					<thead>
 						<tr>
-							<th>ID</th><th>姓名</th><th>薪資</th><th>刪除</th>
+							<th>ID</th><th>姓名</th><th>薪資</th><th>修改</th><th>刪除</th>
 						</tr>
 					</thead>
-						<tbody id="employee-list">
-						</tbody>
+					<tbody id="employee-list">
+						
+					</tbody>
 				</table>
 			</fieldset>
+			
 		</form>
+		
 	</body>
 </html>

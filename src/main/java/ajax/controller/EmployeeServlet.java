@@ -49,7 +49,8 @@ public class EmployeeServlet extends HttpServlet {
 		Employee employee = gson.fromJson(reader, Employee.class);
 		// 新增
 		employeeDao.addEmployee(employee);
-		out.print("{'result': 'ADD OK'}");
+		resp.setStatus(HttpServletResponse.SC_OK);
+		out.print("{\"result\": \"ADD OK\"}");
 		out.flush();
 	}
 	
@@ -67,7 +68,7 @@ public class EmployeeServlet extends HttpServlet {
 				Employee updateEmployee = gson.fromJson(reader, Employee.class);
 				updateEmployee.setId(id);
 				employeeDao.updateEmployee(id, updateEmployee);
-				out.print("{'result': 'UPDATE OK'}");
+				out.print("{\"result\": \"UPDATE OK\"}");
 				out.flush();
 			}
 		} catch (Exception e) {
@@ -86,7 +87,7 @@ public class EmployeeServlet extends HttpServlet {
 			} else {
 				PrintWriter out = resp.getWriter();
 				employeeDao.deleteEmployee(id);
-				out.print("{'result': 'DELETE OK'}");
+				out.print("{\"result\": \"DELETE OK\"}");
 				out.flush();
 			}
 		} catch (Exception e) {
