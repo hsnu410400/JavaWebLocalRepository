@@ -14,6 +14,7 @@
             window.onload = function () {
                 //獲取DOM元件
                 var loginBtn       = document.getElementById("loginBtn");
+                var clossBtn       = document.getElementById("clossBtn");
                 var userNameInput  = document.getElementById("userNameInput");
                 var infoWindow     = document.getElementById("infoWindow");
                 var infoURL        = document.getElementById("infoURL");
@@ -33,6 +34,11 @@
                         infoWindow.innerHTML = "請輸入名稱";
                     }
 
+                });
+                clossBtn.addEventListener("click", function () {
+                    if (webSocket != null) {
+                        webSocket.close();
+                    }
                 });
 				
                 //Submit Form時送出訊息
@@ -58,7 +64,7 @@
                 //設置WebSocket
                 function setWebSocket() {
 					console.log('Ready to run WebSocket');
-                    var url = 'ws://192.168.1.10:8080/JavaWeb/websocketText';
+                    var url = 'ws://localhost:8080/JavaWeb/websocketText';
                     infoURL.innerText = url;
                     //開啟websocket連線
                     webSocket = new WebSocket(url);
@@ -86,6 +92,14 @@
                         loginBtn.disabled = false;
                         userNameInput.disabled = false;
                         infoWindow.innerHTML = "連線失敗";
+                    };
+                    //onclose 連線被關閉
+                    webSocket.onclose = function(event) {
+                        if (event.wasClean) {
+                            infoWindow.innerHTML = "連線已經關閉";
+                        } else {
+                            infoWindow.innerHTML = "連線意外中斷";
+                        }
                     }
                 }
             }
@@ -99,6 +113,7 @@
                     <legend>聊天室</legend>
                     <input type="text" id="userNameInput" placeholder="請輸入名稱" /> 
                     <input type="button" id="loginBtn" value="登入" class="pure-button pure-button-primary" /> 
+                    <input type="button" id="closeBtn" value="關閉" class="pure-button pure-button-primary" />
                     <br>
                     <span id="infoWindow"></span>
                     <span id="infoURL"></span>
