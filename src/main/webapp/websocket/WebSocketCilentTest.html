@@ -21,7 +21,7 @@
                 var userinput      = document.getElementById("userinput");
                 var chatRoomForm   = document.getElementById("chatRoomForm");
                 var messageDisplay = document.getElementById("messageDisplay");
-
+                var count          = document.getElementById("count");
                 var webSocket;
                 var isConnectSuccess = false;
 
@@ -88,7 +88,10 @@
 					// onmessage, 接收來自 socket server 的信息 
 					webSocket.onmessage = function(event) {
 						var msg = JSON.parse(event.data);
+                        console.log(msg);
+                        console.log(msg.count);
 						messageDisplay.innerHTML += msg.userName + "說: " + msg.message + "<br>";
+                        count.innerHTML = "<b>" + msg.count + "</b>"
 					};
 					
 					// onerror 連線失敗時執行
