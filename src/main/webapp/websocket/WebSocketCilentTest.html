@@ -14,7 +14,7 @@
             window.onload = function () {
                 //獲取DOM元件
                 var loginBtn       = document.getElementById("loginBtn");
-                var clossBtn       = document.getElementById("clossBtn");
+                var closeBtn       = document.getElementById("closeBtn");
                 var userNameInput  = document.getElementById("userNameInput");
                 var infoWindow     = document.getElementById("infoWindow");
                 var infoURL        = document.getElementById("infoURL");
@@ -35,9 +35,11 @@
                     }
 
                 });
-                clossBtn.addEventListener("click", function () {
-                    if (webSocket != null) {
-                        webSocket.close();
+                
+                // 手動關閉 WebSocket
+                closeBtn.addEventListener("click", function () {
+                    if(webSocket != null) {
+                    	webSocket.close();
                     }
                 });
 				
@@ -64,44 +66,51 @@
                 //設置WebSocket
                 function setWebSocket() {
 					console.log('Ready to run WebSocket');
-                    var url = 'ws://localhost:8080/JavaWeb/websocketText';
-                    infoURL.innerText = url;
-                    //開啟websocket連線
-                    webSocket = new WebSocket(url);
-                    //onopen連線成功時觸發
-                    webSocket.onopen = function() {
-                        infoWindow.innerHTML = "連線成功";
-                        isConnectSuccess = true;
-                        loginBtn.disabled = true;
-                        userNameInput.disabled = true;
-                        //連線成功時，發送一個訊息
-                        var msg = {
-                            userName: userNameInput.value,
-                            message: "大家好！"
-                        };
-                        webSocket.send(JSON.stringify(msg));
-                    };
-                    //onmessage,接收來自socket server 的訊息
-                    webSocket.onmessage = function(event) {
-                        var msg = JSON.parse(event.data);
-                        messageDisplay.innerHTML += msg.userName + "說：" + msg.message + "</br>";
-                    };
+					var url = 'ws://192.168.1.31:8080/JavaWeb/websocketTest';
+					infoURL.innerText = url;
+					// 開啟 WebSocket 連線
+					webSocket = new WebSocket(url);
+					
+					// onopen 連線成功時觸發 
+					webSocket.onopen = function() {
+						infoWindow.innerHTML = "連線成功";
+						isConnectSuccess = true;
+						loginBtn.disabled = true;
+						userNameInput.disabled = true;
+						// 當連線成功的時候就發送一個訊息
+						var msg = {
+							userName: userNameInput.value,
+							message: "大家好 !"
+						};
+						webSocket.send(JSON.stringify(msg));
+					};
+					
+					// onmessage, 接收來自 socket server 的信息 
+					webSocket.onmessage = function(event) {
+						var msg = JSON.parse(event.data);
+						messageDisplay.innerHTML += msg.userName + "說: " + msg.message + "<br>";
+					};
+					
+					// onerror 連線失敗時執行
+					webSocket.onerror = function(event) {
+						loginBtn.disabled = false;
+						userNameInput.disabled = false;
+						infoWindow.innerHTML = "連線失敗";
+					};
+					
+					// onclose 連線被關閉
+					webSocket.onclose = function(event) {
+						if(event.wasClean) {
+							infoWindow.innerHTML = "連線已經關閉";
+						} else {
+							infoWindow.innerHTML = "連線意外中斷";
+						}
+						loginBtn.disabled = false;
+						userNameInput.disabled = false;
+					}
 
-                    //onerror 連線失敗時執行
-                    webSocket.onerror = function(event) {
-                        loginBtn.disabled = false;
-                        userNameInput.disabled = false;
-                        infoWindow.innerHTML = "連線失敗";
-                    };
-                    //onclose 連線被關閉
-                    webSocket.onclose = function(event) {
-                        if (event.wasClean) {
-                            infoWindow.innerHTML = "連線已經關閉";
-                        } else {
-                            infoWindow.innerHTML = "連線意外中斷";
-                        }
-                    }
                 }
+                
             }
         </script>
     </head>
@@ -110,7 +119,7 @@
         <div>
             <form class="pure-form" id="chatRoomForm" onsubmit="return false;">
                 <fieldset>
-                    <legend>聊天室</legend>
+                    <legend>聊天室 (線上人數: <span id="count">0</span>)</legend>
                     <input type="text" id="userNameInput" placeholder="請輸入名稱" /> 
                     <input type="button" id="loginBtn" value="登入" class="pure-button pure-button-primary" /> 
                     <input type="button" id="closeBtn" value="關閉" class="pure-button pure-button-primary" />

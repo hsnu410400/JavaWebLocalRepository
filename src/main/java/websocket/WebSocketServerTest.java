@@ -9,6 +9,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import com.google.gson.Gson;
+
 @ServerEndpoint("/websocketTest")
 public class WebSocketServerTest {
 	
@@ -30,11 +32,21 @@ public class WebSocketServerTest {
 	@OnMessage
 	public void onMessage(String message, Session session) throws Exception {
 		System.out.printf("ID: %s message: %s\n", session.getId(), message);
-		// 群播給每一個 client
+		Gson gson = new Gson();
+		MessageInfo messageInfo = gson.fromJson(message, MessageInfo.class);
+
+		// 將當前連線數量設定為 count 屬性的值
+		int count = sessions.size();
+		messageInfo.setCount(count);
+
+		// 將 Java 物件轉換為 JSON 字串
+		String json = gson.toJson(messageInfo);
+
+		// 將包含 count 屬性的 JSON 字串發送給所有客戶端
 		sessions.forEach(s -> {
-			if(s.isOpen()) {
-				s.getAsyncRemote().sendText(message);
-			}
+		    if(s.isOpen()) {
+		        s.getAsyncRemote().sendText(json);
+		    }
 		});
 	}
 	
