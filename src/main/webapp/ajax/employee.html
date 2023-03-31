@@ -8,6 +8,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script type="text/javascript">
 			var apiEndpoint = '/JavaWeb/ajax/employees/';
+			var employeeList = null;
 			
 			// 頁面載入完畢後所自動要執行的第一個程序
 			$(document).ready(function() {
@@ -22,10 +23,81 @@
 					var salary = $('#salary-input').val();
 					// 建立物件
 					var employee = {id: empId, name: name, salary: salary};
-					// 調用新增方法
-					addEmployee(employee);
+					
+					// 判定 submit-btn 的 text
+					switch ($('#submit-btn').text()) {
+						case '新增':
+							addEmployee(employee); // 調用新增方法		
+							break;
+						case '修改':
+							updateEmployee(employee); // 調用修改方法
+							break;
+						case '刪除':
+							deleteEmployee(employee); // 調用刪除方法
+							break;	
+					}
+					
+					// 將表單重置 reset
+					$('#add-form')[0].reset();
 				});
+				
+				// 若表單 reset 要將 submit-btn 變為 '新增'
+				$('#add-form')[0].addEventListener('reset', function() {
+					$('#submit-btn').text('新增');
+				});
+				
 			});	
+			
+			// 按下 edit-btn
+			$(document).on('click', '.edit-btn, .del-btn', function() {
+				
+				var empId = $(this).closest('tr').find('td:first').text();
+				var name = $(this).closest('tr').find('td:nth-of-type(2)').text();
+				var salary = $(this).closest('tr').find('td:nth-of-type(3)').text();
+				console.log(empId);
+				console.log(name);
+				console.log(salary);
+				// 將資料放到表單中
+				$("#id-input").val(empId);
+				$("#name-input").val(name);
+				$("#salary-input").val(salary);
+				// 變更 submit-btn 的名字
+				$("#submit-btn").text($(this).hasClass('edit-btn')?'修改':'刪除');
+			});
+			
+			// 按下 salary-field
+			$(document).on('click', '.salary-field', function() {
+				var employees = employeeList;
+				// 增加一個屬性 data-sort-order 來決定排序方向
+				var sortOrder = this.getAttribute('data-sort-order') || 'desc';
+				if(sortOrder == 'desc') {
+					employees.sort(function(emp1, emp2) {
+						return emp2.salary - emp1.salary;
+					});
+					this.setAttribute('data-sort-order', 'asc');
+				} else {
+					employees.sort(function(emp1, emp2) {
+						return emp1.salary - emp2.salary;
+					});
+					this.setAttribute('data-sort-order', 'desc');
+				}
+				console.log(JSON.stringify(employees));
+				$("#employee-list").empty();
+				$.each(employees, function(index, emp){
+					var html = '';
+					// 組 tbody-tr-td
+					html += '<tr>';
+					html += '<td>' + emp.id + '</td>';
+					html += '<td>' + emp.name + '</td>';
+					html += '<td>' + emp.salary + '</td>';
+					html += '<td class="edit-btn">修改</td>';
+					html += '<td class="del-btn">刪除</td>';
+					html += '</tr>';
+					
+					$("#employee-list").append(html);
+				});
+			});
+			
 			
 			// 新增
 			function addEmployee(employee) {
@@ -50,6 +122,46 @@
 				});
 			}
 			
+			// 修改
+			function updateEmployee(employee) {
+				$.ajax({
+					url: apiEndpoint + employee.id,
+					type: "PUT",
+					dataType: "json",
+					data: JSON.stringify(employee), // 將 employee物件 轉 json 格式的字串
+					contentType: "application/json",
+					success: function(employees) {
+						console.log(employees);
+						// 調用查詢所有資料方法
+						queryAllEmployees();
+					},
+					error: function(jqXHR, textStatus) {
+						console.log("修改失敗");
+						console.log(jqXHR.status);
+						console.log(textStatus);
+					}
+				});
+			}
+			
+			// 刪除
+			function deleteEmployee(employee) {
+				$.ajax({
+					url: apiEndpoint + employee.id,
+					type: "DELETE",
+					dataType: "json",
+					success: function(employees) {
+						console.log(employees);
+						// 調用查詢所有資料方法
+						queryAllEmployees();
+					},
+					error: function(jqXHR, textStatus) {
+						console.log("刪除失敗");
+						console.log(jqXHR.status);
+						console.log(textStatus);
+					}
+				});
+			}
+			
 			// 查詢所有資料
 			function queryAllEmployees() {
 				$.ajax({
@@ -57,6 +169,7 @@
 					type: "GET",
 					dataType: "json",
 					success: function(employees) {
+						employeeList = employees;
 						console.log(employees);
 						$("#employee-list").empty();
 						$.each(employees, function(index, emp){
@@ -66,8 +179,8 @@
 							html += '<td>' + emp.id + '</td>';
 							html += '<td>' + emp.name + '</td>';
 							html += '<td>' + emp.salary + '</td>';
-							html += '<td>修改</td>';
-							html += '<td>刪除</td>';
+							html += '<td class="edit-btn">修改</td>';
+							html += '<td class="del-btn">刪除</td>';
 							html += '</tr>';
 							
 							$("#employee-list").append(html);
@@ -101,7 +214,7 @@
 				<table class="pure-table pure-table-bordered">
 					<thead>
 						<tr>
-							<th>ID</th><th>姓名</th><th>薪資</th><th>修改</th><th>刪除</th>
+							<th>ID</th><th>姓名</th><th title="按我一下可以排序" style="cursor: pointer;" class="salary-field">薪資</th><th>修改</th><th>刪除</th>
 						</tr>
 					</thead>
 					<tbody id="employee-list">
